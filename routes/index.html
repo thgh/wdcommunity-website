@@ -1,0 +1,160 @@
+<:Head>
+  <title>WD community</title>
+</:Head>
+
+<Layout page='home'>
+  <div class="container">
+    <section class="intro">
+      <h1>WD community</h1>
+      <p class="lead">
+        We are a group of data enthousiasts getting the most out of storage.
+      </p>
+      <form class="search">
+        <label class="input-group mb-3">
+          <input type="text" class="form-control" bind:value="q" id="q" name="q" placeholder="Search packages for your NAS..." aria-label="Search query">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button">Search</button>
+          </div>
+        </label>
+      </form>
+    </section>
+
+    <section class="docs">
+      <h2>Getting started</h2>
+
+      <p>Add <span style="user-select: all">https://dl.wdcommunity.com</span> as Package source.</p>
+    </section>
+
+    <section>
+      <h2 class="mb-3">{{!list.length ? 'No search results' : (!q && featuredPkgs.length) ? 'Featured packages' : q ? 'Search results' : 'All packages' }}</h2>
+      <div class="card-deck">
+        {{#each list as pkg, index}}
+          {{#if !(index % 2)}}<div class="w-100 d-none d-sm-block d-md-none"></div>{{/if}}
+          {{#if !(index % 3)}}<div class="w-100 d-none d-md-block d-lg-none"></div>{{/if}}
+          {{#if !(index % 4)}}<div class="w-100 d-none d-lg-block d-xl-none"></div>{{/if}}
+          {{#if !(index % 5)}}<div class="w-100 d-none d-xl-block"></div>{{/if}}
+          <div class="card mb-4">
+            {{#if pkg.image}}
+            <img class="card-img-top" src="{{pkg.image}}" alt="Card image cap">
+            {{/if}}
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{pkg.name}}</h5>
+              <p class="card-text">
+                {{pkg.description}}
+              </p>
+              <p class="card-text">
+                <small class=" text-muted">{{pkg.version}}</small>
+              </p>
+              <p class="card-text mt-auto cta">
+                <a href="/pkg/{{pkg.name}}/{{pkg.version}}/package.json" class="btn btn-outline-primary btn-block" download>Download</a>
+              </p>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </section>
+
+    <section>
+      <h2>Contribute</h2>
+
+      <p>You can contribute and find the <a href="https://github.com/WDCommunity/wdpksrc">source on GitHub</a>.</p>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  h2 {
+    font-size: 1.7em;
+  }
+  .card-deck {
+    justify-content: centerd;
+  }
+  .card-img-top {
+    padding: 10px;
+    height: 100px;
+    object-fit: contain;
+  }
+  .cta {
+    margin: 1em -21px -21px;
+  }
+  .cta .btn {
+    /*border-width: 1px 0 0;*/
+    border-color: transparent;
+    border-top-color: rgba(0,0,0,.125);
+    border-top-left-radius: 0!important;
+    border-top-right-radius:0!important;
+  }
+  section {
+    margin: 2em 0;
+  }
+  @media (min-width: 480px) {
+    section {
+      margin: 3em 0;
+    }
+    .intro {
+      margin-top: 5vh;
+      margin-bottom: 5vh;
+    }
+    .search {
+      width: 400px;
+    }
+  }
+  @media (min-width: 576px) {
+    .card-deck .card {
+      max-width: 240px;
+    }
+  }
+  @media (min-width: 768px) {
+    .card-deck .card {
+      max-width: 208px;
+    }
+  }
+</style>
+
+<script>
+  import Layout from './_components/Layout.html'
+
+  let keywordsReady = false
+
+  export default {
+    components: {
+      Layout
+    },
+    data () {
+      return {
+        featured: ['anotdher', 'featured', 'hello-world'],
+        q: '',
+        packages: []
+      }
+    },
+    computed: {
+      featuredPkgs (featured, packages) {
+        return featured.map(f => packages.find(p => p.name === f)).filter(Boolean)
+      },
+      list (q, featuredPkgs, packages) {
+        if (!q && featuredPkgs.length) {
+          return featuredPkgs
+        }
+        if (!keywordsReady) {
+          packages.forEach(p => {
+            p.keywords = [p.name, (p.description || '').split(' ')].filter(Boolean)
+            p.keywordStr = p.keywords.join(' ')
+          })
+        }
+        return packages.filter(p => p.keywordStr.includes(q))
+      }
+    },
+    preload ({ query }) {
+      const q = query.q || ''
+      return this.fetch('/packages.json')
+        .then(r => r.json())
+        .then(packages => {
+          return ({ packages, q })
+        })
+        .catch(err => console.log(err))
+    },
+    oncreate () {
+      console.log(this.get('packages'))
+    }
+  }
+</script>
