@@ -172,7 +172,7 @@
       const _vIndex = tag.tag_name.lastIndexOf('-v')
       const _Index = tag.tag_name.lastIndexOf('-')
       if (_vIndex > 1) {
-        pkg.name = tag.tag_name.slice(0, _vIndex)
+        pkg.name = tag.tag_name.slice(0, _vIndex)        
         pkg.version = tag.tag_name.slice(_vIndex + 2)
       } else if (_Index > 1) {
         pkg.name = tag.tag_name.slice(0, _Index)
@@ -180,6 +180,8 @@
       } else {
         pkg.version = ''
       }
+      // Set image
+      pkg.image = 'https://github.com/WDCommunity/wdpksrc/raw/master/wdpk/emby/web/' + pkg.name + '.png'
 
       // Calculate numeric version
       const parts = pkg.version.split('.')
