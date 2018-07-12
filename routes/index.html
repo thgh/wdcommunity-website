@@ -33,11 +33,13 @@
       </form>
     </section>
 
-    <section class="docs">
-      <h2>Getting started</h2>
+    {{#if !q}}
+      <section class="docs">
+        <h2>Getting started</h2>
 
-      <p>Add <span style="user-select: all">https://dl.wdcommunity.com</span> as Package source.</p>
-    </section>
+        <p>Add <span style="user-select: all">https://dl.wdcommunity.com</span> as Package source.</p>
+      </section>
+    {{/if}}
 
     <section>
       <h2 class="mb-3">{{!filtered.length ? 'No search results' : (!q && featuredPkgs.length) ? 'Featured packages' : q ? 'Search results' : 'All packages' }}</h2>
